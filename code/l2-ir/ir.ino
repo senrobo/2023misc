@@ -56,6 +56,20 @@ void readIR(int n)
         tempValues[23] += digitalReadFast(18) ^ 1;
     }
 
-    tsopCounter++; //+1 to counter to count the no. of times it read
+    tsspCounter++; //+1 to counter to count the no. of times it read
 }
+
+void processIR()
+{
+    // Complete a reading of the sensors after a certain amount of individual readings, sensor values are now stored in the values array until the next complete read
+    for (int i = 0; i < 23; i++)
+    {
+        values[i] = 100 * (double)tempValues[i] / (double)tsspCounter; // calculate the average value of the sensor
+        tempValues[i] = 0;                                             // reset the temp values
+        sortedValues[i] = 0;
+        indexes[i] = 0;
+        tsspCounter = 0;
+    }
+    // Sort the values
+    // Get the best IR Signal
 }
