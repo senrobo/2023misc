@@ -70,6 +70,168 @@ void processIR()
         indexes[i] = 0;
         tsspCounter = 0;
     }
-    // Sort the values
-    // Get the best IR Signal
+
+    IRsortvalues();
+    IRcalculateanglestrength(TSOP_BEST_TSOP_NUMBER);
+}
+
+void IRsortvalues()
+{
+    // Sort the TSOP values from greatest to least in sortedFilteredValues
+    // and sort the TSOP indexes from greatest to least strength in indexes (array positions)
+
+    for (uint8_t i = 0; i < TSOP_NUM; i++)
+    {
+        for (uint8_t j = 0; j < TSOP_NUM; j++)
+        {
+            if (values[i] > sortedValues[j])
+            {
+                // We've found our place!
+                // Shift elements from index j down
+                if (j <= i)
+                {
+                    // Make sure we only shift what is needed
+                    ARRAYSHIFTDOWN(sortedValues, j, i); // sort strength from weakest to strongest in the array
+                    ARRAYSHIFTDOWN(indexes, j, i);      // sort the indexes
+                }
+
+                sortedValues[j] = values[i];
+                indexes[j] = i;
+                break;
+            }
+        }
+    }
+}
+
+void IRcalculateanglestrength(int n)
+{
+    // Cartesian addition of best n TSOPs
+    float s = 0;
+    float t = 0;
+    noValsCounter = 0;
+
+    for (int i = 0; i < 16; i++)
+    {
+        s += sortedValues[i];
+        if (sortedValues[i] == 0)
+        {
+            noValsCounter++;
+        }
+    }
+    for (int i = 0; i < n; i++)
+    {
+        t += sortedValues[i];
+    }
+    strength = t / s; // calculate strength as a proportion number, between 0 and 1 ***check reliability
+    if (loopcounter < 1)
+    {
+
+        if (s == 0)
+        {
+            angle = lastangle;
+            // Serial.println("is there ball??");
+            loopcounter++;
+        }
+        else
+        {
+            if (indexes[0] == 0 || indexes[1] == 0 || indexes[2] == 0)
+            {
+                if (sortedValues[0] > 60)
+                {
+                    angle = 0;
+                    // Serial.println("front");
+                }
+                else
+                {
+                    angle = indexes[0] * 22.5;
+                    lastangle = angle;
+                    // Serial.println("haha");
+                }
+            }
+
+            else
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    angle_kp[i] = indexes[i] * sortedValues[i] * 22.5 / (sortedValues[0] + sortedValues[1] + sortedValues[2]); // 22.5 is the angle between each sensor
+                }
+                angle = angle_kp[0] + angle_kp[1] + angle_kp[2];
+                lastangle = angle;
+                // Serial.println("ree");
+            } // end of else statement for normal angle calculation
+            loopcounter = 0;
+        } // end of if statement if first 3 IRs = 0
+
+    } // end of loopcounter <1
+
+    else if (loopcounter >= 1)
+    {
+        if (sortedValues[0] > 0)
+        {
+            angle = 0;
+            loopcounter = 0;
+        }
+        else
+        {
+            angle = 400; // no ball detected
+            lastangle = angle;
+            // Serial.println("no ball");
+        }
+        loopcounter = 0;
+    }
+    else
+        ;
+
+    // Serial.println(loopcounter); //HELP ME
+}
+
+uint16_t IRgetAngle()
+{
+    return angle;
+}
+
+float IRgetStrength()
+{
+    // return strength;
+    return strength;
+}
+
+// IR timer stuff
+Timer::Timer(unsigned long duration)
+{
+    timerDuration = duration;
+}
+
+void Timer::update()
+{
+    lastUpdate = micros();
+}
+
+bool Timer::timeHasPassed()
+{
+    if (micros() - lastUpdate > timerDuration)
+    {
+        lastUpdate = micros();
+        return true;
+    }
+
+    return false;
+}
+
+bool Timer::timeHasPassedNoUpdate()
+{
+    return micros() - lastUpdate > timerDuration;
+}
+
+void Timer::resetTime()
+{
+    lastUpdate = micros();
+}
+
+void processballstrength()
+{
+    if (noValsCounter > 2)
+        ballstatus = 1; // if far away return 1
+    else
+        ballstatus = 0;
 }
