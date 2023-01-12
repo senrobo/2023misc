@@ -1,0 +1,1 @@
+{"type": "library", "name": "CMSIS_DSP", "version": "1.0.0+sha.b57fab9", "spec": {"owner": null, "id": null, "name": "Arduino_Core_STM32", "requirements": null, "uri": "git+https://github.com/stm32duino/Arduino_Core_STM32"}}
