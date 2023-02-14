@@ -9,13 +9,8 @@ void setup()
   pinMode(13, OUTPUT);
 }
 
-void loop()
+void readCamera()
 {
-  // put your main code here, to run repeatedly:
-  digitalWrite(13, HIGH); // turn the LED on (HIGH is the voltage level)
-  delay(2000);            // wait for a second
-  digitalWrite(13, LOW);  // turn the LED off by making the voltage LOW
-  delay(2000);            // wait for a second
   int goalX = 0;
   while (Serial3.available() < 1)
     ;
@@ -23,4 +18,14 @@ void loop()
   Serial.print(goalX);
   Serial.print(" ");
   Serial.println();
+}
+
+void loop()
+{
+  // put your main code here, to run repeatedly:
+  digitalWrite(13, HIGH); // turn the LED on (HIGH is the voltage level)
+  delay(2000);            // wait for a second
+  digitalWrite(13, LOW);  // turn the LED off by making the voltage LOW
+  delay(2000);            // wait for a second
+  readCamera();
 }
