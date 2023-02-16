@@ -51,13 +51,10 @@ void loop()
 {
   // put your main code here, to run repeatedly:
   // readCamera();
-  //readIR();
-  //Serial.println("Im not dead");
-
-  //readIR
-  //readIMU
-  //readUltra
-  //readCamera
-  //readLight
-  //chaseBall
+  readIR();
+  Serial.println("Im not dead");
+  digitalWrite(13, HIGH); // turn the LED on (HIGH is the voltage level)
+  delay(1000);            // wait for a second
+  digitalWrite(13, LOW);  // turn the LED off by making the voltage LOW
+  delay(1000);            // wait for a second
 }
