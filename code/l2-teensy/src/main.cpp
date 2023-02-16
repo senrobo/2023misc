@@ -51,6 +51,13 @@ void loop()
 {
   // put your main code here, to run repeatedly:
   // readCamera();
-  readIR();
-  Serial.println("Im not dead");
+  //readIR();
+  //Serial.println("Im not dead");
+
+  //readIR
+  //readIMU
+  //readUltra
+  //readCamera
+  //readLight
+  //chaseBall
 }

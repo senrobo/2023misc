@@ -1,4 +1,5 @@
-#include "NewPing.h"
+#include <Arduino.h>
+#include <NewPing.h>
 
 #define frontECHO = 10
 #define frontTRIG = 11
@@ -11,7 +12,7 @@
 #define externalLED = 2
 #define maxDist = 400
 
-float frontDist, backDist, rightDist, leftDist;
+
 
 void setup()
 {
@@ -21,7 +22,6 @@ void setup()
   NewPing sonar2(backTRIG, backECHO, maxDist);
   NewPing sonar3(leftTRIG, leftECHO, maxDist);
   NewPing sonar4(rightTRIG, rightECHO, maxDist);
-  pinMODE(externalLED, OUTPUT);
 }
 
 void loop()
@@ -31,6 +31,5 @@ void loop()
   backDist = sonar2.ping_cm();
   leftDist = sonar3.ping_cm();
   rightDist = sonar4.ping_cm();
-  Serial.write(frontDist);
+  
 }
-

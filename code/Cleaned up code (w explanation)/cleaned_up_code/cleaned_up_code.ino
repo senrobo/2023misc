@@ -48,12 +48,6 @@ int angVel, angleError;
 float cmpangle, cmpoffset=0;
 Adafruit_BNO055 bno = Adafruit_BNO055(WIRE_BUS, -1, BNO055_ADDRESS_A, I2C_MASTER, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_100, I2C_OP_MODE_ISR);
 
-
-//camera variables
-int radgoal;
-int goalX;
-float goalangle;
-
 //IR variables
 unsigned short  ballAngle, realBallStrength, realBallAngle, lastAngle;
 float ballStrength, ballDistance;
