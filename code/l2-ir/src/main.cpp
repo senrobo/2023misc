@@ -40,30 +40,30 @@ void initIR()
 void readIR()
 {
   // loops through the sensors once
-  tempValues[0] = digitalReadFast(PA5) ^ 1;
-  tempValues[1] = digitalReadFast(PA4) ^ 1;
-  tempValues[2] = digitalReadFast(PA1) ^ 1;
-  tempValues[3] = digitalReadFast(PA0) ^ 1;
-  tempValues[4] = digitalReadFast(PC15) ^ 1;
-  tempValues[5] = digitalReadFast(PC14) ^ 1;
-  tempValues[6] = digitalReadFast(PB9) ^ 1;
-  tempValues[7] = digitalReadFast(PB8) ^ 1;
-  tempValues[8] = digitalReadFast(PB7) ^ 1;
-  tempValues[9] = digitalReadFast(PB6) ^ 1;
-  tempValues[10] = digitalReadFast(PB5) ^ 1;
-  tempValues[11] = digitalReadFast(PB4) ^ 1;
-  tempValues[12] = digitalReadFast(PB3) ^ 1;
-  tempValues[13] = digitalReadFast(PA15) ^ 1;
-  tempValues[14] = digitalReadFast(PB14) ^ 1;
-  tempValues[15] = digitalReadFast(PB13) ^ 1;
-  tempValues[16] = digitalReadFast(PB12) ^ 1;
-  tempValues[17] = digitalReadFast(PB11) ^ 1;
-  tempValues[18] = digitalReadFast(PB10) ^ 1;
-  tempValues[19] = digitalReadFast(PB2) ^ 1;
-  tempValues[20] = digitalReadFast(PB1) ^ 1;
-  tempValues[21] = digitalReadFast(PB0) ^ 1;
-  tempValues[22] = digitalReadFast(PA7) ^ 1;
-  tempValues[23] = digitalReadFast(PA6) ^ 1;
+  tempValues[0] = digitalRead(PIN_A5) ^ 1;
+  tempValues[1] = digitalRead(PA4) ^ 1;
+  tempValues[2] = digitalRead(PA1) ^ 1;
+  tempValues[3] = digitalRead(PA0) ^ 1;
+  tempValues[4] = digitalRead(PC15) ^ 1;
+  tempValues[5] = digitalRead(PC14) ^ 1;
+  tempValues[6] = digitalRead(PB9) ^ 1;
+  tempValues[7] = digitalRead(PB8) ^ 1;
+  tempValues[8] = digitalRead(PB7) ^ 1;
+  tempValues[9] = digitalRead(PB6) ^ 1;
+  tempValues[10] = digitalRead(PB5) ^ 1;
+  tempValues[11] = digitalRead(PB4) ^ 1;
+  tempValues[12] = digitalRead(PB3) ^ 1;
+  tempValues[13] = digitalRead(PA15) ^ 1;
+  tempValues[14] = digitalRead(PB14) ^ 1;
+  tempValues[15] = digitalRead(PB13) ^ 1;
+  tempValues[16] = digitalRead(PB12) ^ 1;
+  tempValues[17] = digitalRead(PB11) ^ 1;
+  tempValues[18] = digitalRead(PB10) ^ 1;
+  tempValues[19] = digitalRead(PB2) ^ 1;
+  tempValues[20] = digitalRead(PB1) ^ 1;
+  tempValues[21] = digitalRead(PB0) ^ 1;
+  tempValues[22] = digitalRead(PA7) ^ 1;
+  tempValues[23] = digitalRead(PA6) ^ 1;
 }
 
 // void processIR()
