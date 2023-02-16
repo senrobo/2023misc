@@ -51,17 +51,6 @@ void returnBase() {
     Serial.println("YOU BETTER STOP");
   }
   else  runningSpeed = 55;
-  /*if (returned>3) {
-    runningSpeed = 0;
-    returned = 0;
-  }*/
   angular_drive(runningSpeed,robotAngle,0);
   angle_correct();
-  /*Serial.print(diff0);
-  Serial.print(" | ");
-  Serial.print(diff1);
-  Serial.print(" | ");
-  Serial.print(diff2);
-  Serial.print(" | ");
-  Serial.println(robotAngle);*/
 }

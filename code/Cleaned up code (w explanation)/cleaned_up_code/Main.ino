@@ -41,7 +41,7 @@ void loop() {
         digitalWrite(LED_BUILTIN, ledOn);
         ledOn = !ledOn;
     }
-  readnano();
+  
   readlight1();
   readlight2();
   chaseball();
