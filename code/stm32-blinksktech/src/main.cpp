@@ -3,14 +3,14 @@
 void setup()
 {
   // put your setup code here, to run once:
-  pinMode(PB15, OUTPUT);
+  pinMode(PB12, OUTPUT);
 }
 
 void loop()
 {
   // put your main code here, to run repeatedly: 
-  digitalWrite(PB15, HIGH);
+  digitalWrite(PB12, HIGH);
   delay(250);
-  digitalWrite(PB15, LOW);
+  digitalWrite(PB12, LOW);
   delay(250);
 }

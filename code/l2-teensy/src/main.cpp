@@ -15,6 +15,9 @@ void setup()
   delay(1000);            // wait for a second
   digitalWrite(13, LOW);  // turn the LED off by making the voltage LOW
   delay(1000);            // wait for a second
+
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
 }
 
 void readCamera()
@@ -51,10 +54,20 @@ void loop()
 {
   // put your main code here, to run repeatedly:
   // readCamera();
-  readIR();
-  Serial.println("Im not dead");
-  digitalWrite(13, HIGH); // turn the LED on (HIGH is the voltage level)
-  delay(1000);            // wait for a second
-  digitalWrite(13, LOW);  // turn the LED off by making the voltage LOW
-  delay(1000);            // wait for a second
+  // readIR();
+  // digitalWrite(13, HIGH); // turn the LED on (HIGH is the voltage level)
+  // delay(1000);            // wait for a second
+  // digitalWrite(13, LOW);  // turn the LED off by making the voltage LOW
+  // delay(1000);            // wait for a second
+
+
+  digitalWrite(6, 1);
+  for (int i = 0; i < 255; i++) {
+    analogWrite(5, i);
+    delay(10);
+  }
+  for (int i = 255; i > 0; i--) {
+    analogWrite(5, i);
+    delay(10);
+  }
 }
