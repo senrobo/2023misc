@@ -4,9 +4,10 @@
 #define IR_NUM_MULTIPLIER 15
 #define BEST_IR_NUM 3
 
-unsigned short ballAngle, realBallStrength, realBallAngle, lastAngle;
+unsigned short ballAngle, realBallStrength, realBallAngle, lastAngle, tempValues[24];
+
 float ballStrength, ballDistance;
-int IRCounter, tempValues;
+int IRCounter;
 
 void initIR()
 {
@@ -38,79 +39,75 @@ void initIR()
 
 void readIR()
 {
-  for (int i = 0; i < IR_LOOP_NUM; i++)
-  {
-    tempValues[0] = digitalReadFast(PA5) ^ 1;
-    tempValues[1] = digitalReadFast(PA4) ^ 1;
-    tempValues[2] = digitalReadFast(PA1) ^ 1;
-    tempValues[3] = digitalReadFast(PA0) ^ 1;
-    tempValues[4] = digitalReadFast(PC15) ^ 1;
-    tempValues[5] = digitalReadFast(PC14) ^ 1;
-    tempValues[6] = digitalReadFast(PB9) ^ 1;
-    tempValues[7] = digitalReadFast(PB8) ^ 1;
-    tempValues[8] = digitalReadFast(PB7) ^ 1;
-    tempValues[9] = digitalReadFast(PB6) ^ 1;
-    tempValues[10] = digitalReadFast(PB5) ^ 1;
-    tempValues[11] = digitalReadFast(PB4) ^ 1;
-    tempValues[12] = digitalReadFast(PB3) ^ 1;
-    tempValues[13] = digitalReadFast(PA15) ^ 1;
-    tempValues[14] = digitalReadFast(PB14) ^ 1;
-    tempValues[15] = digitalReadFast(PB13) ^ 1;
-    tempValues[16] = digitalReadFast(PB12) ^ 1;
-    tempValues[17] = digitalReadFast(PB11) ^ 1;
-    tempValues[18] = digitalReadFast(PB10) ^ 1;
-    tempValues[19] = digitalReadFast(PB2) ^ 1;
-    tempValues[20] = digitalReadFast(PB1) ^ 1;
-    tempValues[21] = digitalReadFast(PB0) ^ 1;
-    tempValues[22] = digitalReadFast(PA7) ^ 1;
-    tempValues[23] = digitalReadFast(PA6) ^ 1;
-  }
+  // loops through the sensors once
+  tempValues[0] = digitalReadFast(PA5) ^ 1;
+  tempValues[1] = digitalReadFast(PA4) ^ 1;
+  tempValues[2] = digitalReadFast(PA1) ^ 1;
+  tempValues[3] = digitalReadFast(PA0) ^ 1;
+  tempValues[4] = digitalReadFast(PC15) ^ 1;
+  tempValues[5] = digitalReadFast(PC14) ^ 1;
+  tempValues[6] = digitalReadFast(PB9) ^ 1;
+  tempValues[7] = digitalReadFast(PB8) ^ 1;
+  tempValues[8] = digitalReadFast(PB7) ^ 1;
+  tempValues[9] = digitalReadFast(PB6) ^ 1;
+  tempValues[10] = digitalReadFast(PB5) ^ 1;
+  tempValues[11] = digitalReadFast(PB4) ^ 1;
+  tempValues[12] = digitalReadFast(PB3) ^ 1;
+  tempValues[13] = digitalReadFast(PA15) ^ 1;
+  tempValues[14] = digitalReadFast(PB14) ^ 1;
+  tempValues[15] = digitalReadFast(PB13) ^ 1;
+  tempValues[16] = digitalReadFast(PB12) ^ 1;
+  tempValues[17] = digitalReadFast(PB11) ^ 1;
+  tempValues[18] = digitalReadFast(PB10) ^ 1;
+  tempValues[19] = digitalReadFast(PB2) ^ 1;
+  tempValues[20] = digitalReadFast(PB1) ^ 1;
+  tempValues[21] = digitalReadFast(PB0) ^ 1;
+  tempValues[22] = digitalReadFast(PA7) ^ 1;
+  tempValues[23] = digitalReadFast(PA6) ^ 1;
 }
 
-void processIR()
-{
-  // Complete a reading of the sensors after a certain amount of individual readings, sensor values are now stored in the values array until the next complete read
-  for (int i =0, i < IR_NUM, i++)
-  {
-    values[i] = 100 * (double)tempValues[i] / (double)IR_LOOP_NUM; // multiply each value in the array by 100 then divide it by number of times it read the sensors
-    tempValues[i] = 0;                                             // reset values here
-    sortedValues[i] = 0;
-    indexes[i] = 0;
-  }
-  IRCounter = 0;
-  IRsortvalues();
-  IRcalculateanglestrength(BEST_IR_NUMBER);
-}
+// void processIR()
+// {
+//   // Complete a reading of the sensors after a certain amount of individual readings, sensor values are now stored in the values array until the next complete read
+//   for (int i = 0, i < IR_NUM, i++)
+//   {
+//     values[i] = 100 * (double)tempValues[i] / (double)IR_LOOP_NUM; // multiply each value in the array by 100 then divide it by number of times it read the sensors
+//     tempValues[i] = 0;                                             // reset values here
+//     sortedValues[i] = 0;
+//     indexes[i] = 0;
+//   }
+//   IRCounter = 0;
+//   IRsortvalues();
+//   IRcalculateanglestrength(BEST_IR_NUMBER);
+// }
 
-void IRsortvalues()
-{
-    // Sort the TSOP values from greatest to least in sortedFilteredValues
-    // and sort the TSOP indexes from greatest to least strength in indexes (array positions)
+// void IRsortvalues()
+// {
+//   // Sort the TSOP values from greatest to least in sortedFilteredValues
+//   // and sort the TSOP indexes from greatest to least strength in indexes (array positions)
 
-    for (uint8_t i = 0; i < IR_NUM; i++)
-    {
-        for (uint8_t j = 0; j < IR_NUM; j++)
-        {
-            if (values[i] > sortedValues[j])
-            {
-                // We've found our place!
-                // Shift elements from index j down
-                if (j <= i)
-                {
-                    // Make sure we only shift what is needed
-                    ARRAYSHIFTDOWN(sortedValues, j, i); // sort strength from weakest to strongest in the array
-                    ARRAYSHIFTDOWN(indexes, j, i);      // sort the indexes
-                }
+//   for (uint8_t i = 0; i < IR_NUM; i++)
+//   {
+//     for (uint8_t j = 0; j < IR_NUM; j++)
+//     {
+//       if (values[i] > sortedValues[j])
+//       {
+//         // We've found our place!
+//         // Shift elements from index j down
+//         if (j <= i)
+//         {
+//           // Make sure we only shift what is needed
+//           ARRAYSHIFTDOWN(sortedValues, j, i); // sort strength from weakest to strongest in the array
+//           ARRAYSHIFTDOWN(indexes, j, i);      // sort the indexes
+//         }
 
-                sortedValues[j] = values[i];
-                indexes[j] = i;
-                break;
-            }
-        }
-    }
-}
-
-
+//         sortedValues[j] = values[i];
+//         indexes[j] = i;
+//         break;
+//       }
+//     }
+//   }
+// }
 
 void setup()
 {
