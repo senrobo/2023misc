@@ -15,7 +15,8 @@ void setup()
   delay(1000);            // wait for a second
   digitalWrite(13, LOW);  // turn the LED off by making the voltage LOW
   delay(1000);            // wait for a second
-
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
   pinMode(5, OUTPUT);
   pinMode(6, OUTPUT);
 }
@@ -60,14 +61,17 @@ void loop()
   // digitalWrite(13, LOW);  // turn the LED off by making the voltage LOW
   // delay(1000);            // wait for a second
 
+  digitalWriteFast(4, HIGH);
+  digitalWriteFast(6, HIGH);
+  // for (int i = 0; i < 255; i++)
+  // {
+  //   analogWrite(5, i);
+  //   delay(10);
+  // }
+  // for (int i = 255; i > 0; i--)
+  // {
+  //   analogWrite(5, i);
+  //   delay(10);
+  // }
 
-  digitalWrite(6, 1);
-  for (int i = 0; i < 255; i++) {
-    analogWrite(5, i);
-    delay(10);
-  }
-  for (int i = 255; i > 0; i--) {
-    analogWrite(5, i);
-    delay(10);
-  }
 }

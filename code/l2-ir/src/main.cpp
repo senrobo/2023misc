@@ -1,246 +1,140 @@
-#include <Arduino.h>
-
-#define IR_NUM 24      // number of IR sensors
-#define IR_LOOP_NUM 20 // number of times to read the sensors in a loop
-#define BEST_IR_NUM 3  // number of sensors to use to calculate the angle and strength of the ball
-
-// essentially sorting indexes in an array from largest to lowest //
-#define ARRAYLENGTH(array) (sizeof(array) / sizeof(array[0]))
-#define ARRAYSHIFTDOWN(a, lower, upper)          \
-  {                                              \
-    if (upper == (sizeof(a) / sizeof(a[0])) - 1) \
-    {                                            \
-      for (int q = upper - 1; q >= lower; q--)   \
-      {                                          \
-        *(a + q + 1) = *(a + q);                 \
-      }                                          \
-    }                                            \
-    else                                         \
-    {                                            \
-      for (int q = upper; q >= lower; q--)       \
-      {                                          \
-        *(a + q + 1) = *(a + q);                 \
-      }                                          \
-    }                                            \
-  }
-
-unsigned short ballAngle, realBallStrength, realBallAngle, lastangle, angle, tempValues[24];
-float ballStrength, ballDistance, strength;
-float angle_kp[3];
-int IRCounter, noValsCounter, loopcounter;
-uint16_t values[IR_NUM] = {0};       // Sensor values as percentages
-uint16_t sortedValues[IR_NUM] = {0}; // Sorted values (highest to lowest)
-uint8_t indexes[IR_NUM] = {0};       // Indexes of sensor numbers in sorted list
-
-void initIR()
-{
-  pinMode(PA5, INPUT);
-  pinMode(PA4, INPUT);
-  pinMode(PA1, INPUT);
-  pinMode(PA0, INPUT);
-  pinMode(PC15, INPUT);
-  pinMode(PC14, INPUT);
-  pinMode(PB9, INPUT);
-  pinMode(PB8, INPUT);
-  pinMode(PB7, INPUT);
-  pinMode(PB6, INPUT);
-  pinMode(PB5, INPUT);
-  pinMode(PB4, INPUT);
-  pinMode(PB3, INPUT);
-  pinMode(PA15, INPUT);
-  pinMode(PB14, INPUT);
-  pinMode(PB13, INPUT);
-  pinMode(PB12, INPUT);
-  pinMode(PB11, INPUT);
-  pinMode(PB10, INPUT);
-  pinMode(PB2, INPUT);
-  pinMode(PB1, INPUT);
-  pinMode(PB0, INPUT);
-  pinMode(PA7, INPUT);
-  pinMode(PA6, INPUT);
-}
-
-void readIR()
-{
-  // loops through the sensors once
-  tempValues[0] = digitalRead(PIN_A5) ^ 1;
-  tempValues[1] = digitalRead(PA4) ^ 1;
-  tempValues[2] = digitalRead(PA1) ^ 1;
-  tempValues[3] = digitalRead(PA0) ^ 1;
-  tempValues[4] = digitalRead(PC15) ^ 1;
-  tempValues[5] = digitalRead(PC14) ^ 1;
-  tempValues[6] = digitalRead(PB9) ^ 1;
-  tempValues[7] = digitalRead(PB8) ^ 1;
-  tempValues[8] = digitalRead(PB7) ^ 1;
-  tempValues[9] = digitalRead(PB6) ^ 1;
-  tempValues[10] = digitalRead(PB5) ^ 1;
-  tempValues[11] = digitalRead(PB4) ^ 1;
-  tempValues[12] = digitalRead(PB3) ^ 1;
-  tempValues[13] = digitalRead(PA15) ^ 1;
-  tempValues[14] = digitalRead(PB14) ^ 1;
-  tempValues[15] = digitalRead(PB13) ^ 1;
-  tempValues[16] = digitalRead(PB12) ^ 1;
-  tempValues[17] = digitalRead(PB11) ^ 1;
-  tempValues[18] = digitalRead(PB10) ^ 1;
-  tempValues[19] = digitalRead(PB2) ^ 1;
-  tempValues[20] = digitalRead(PB1) ^ 1;
-  tempValues[21] = digitalRead(PB0) ^ 1;
-  tempValues[22] = digitalRead(PA7) ^ 1;
-  tempValues[23] = digitalRead(PA6) ^ 1;
-}
-
-void IRsortvalues()
-{
-  // Sort the TSOP values from greatest to least in sortedFilteredValues
-  // and sort the TSOP indexes from greatest to least strength in indexes (array positions)
-
-  for (uint8_t i = 0; i < IR_NUM; i++)
-  {
-    for (uint8_t j = 0; j < IR_NUM; j++)
-    {
-      if (values[i] > sortedValues[j])
-      {
-        // We've found our place!
-        // Shift elements from index j down
-        if (j <= i)
-        {
-          // Make sure we only shift what is needed
-          ARRAYSHIFTDOWN(sortedValues, j, i); // sort strength from weakest to strongest in the array
-          ARRAYSHIFTDOWN(indexes, j, i);      // sort the indexes
-        }
-
-        sortedValues[j] = values[i];
-        indexes[j] = i;
-        break;
-      }
-    }
-  }
-}
-
-void IRcalculateanglestrength(int n)
-{
-  // Cartesian addition of best n TSOPs
-  float s = 0;
-  float t = 0;
-  noValsCounter = 0;
-
-  for (int i = 0; i < 16; i++)
-  {
-    s += sortedValues[i]; // addition of all values in the array and sum up as 's'
-  }
-  for (int i = 0; i < n; i++)
-  {
-    t += sortedValues[i];
-  }
-  for (int i = 0; i < 16; i++)
-  {
-    if (sortedValues[i] == 0)
-      noValsCounter++;
-  }
-  strength = t / s; // calculate strength as a proportion number, between 0 and 1 ***check reliability, didnt end up using it anyways lmao
-  if (loopcounter < 1)
-  {
-    if (s == 0)
-    {
-      angle = lastangle;
-      // Serial.println("is there ball??");
-      loopcounter++;
-    }
-    else
-    {
-      if (indexes[0] == 0 || indexes[1] == 0 || indexes[2] == 0)
-      {
-        if (sortedValues[0] > 60)
-        {
-          angle = 0;
-          // Serial.println("front");
-        }
-        else
-        {
-          angle = indexes[0] * 22.5;
-          lastangle = angle;
-          // Serial.println("haha");
-        }
-      }
-
-      else
-      {
-        for (int i = 0; i < 3; i++)
-        {
-          angle_kp[i] = indexes[i] * sortedValues[i] * 22.5 / (sortedValues[0] + sortedValues[1] + sortedValues[2]);
-        }
-        angle = angle_kp[0] + angle_kp[1] + angle_kp[2];
-        lastangle = angle;
-        // Serial.println("ree");
-      } // end of else statement for normal angle calculation
-      loopcounter = 0;
-    } // end of if statement if first 3 IRs = 0
-
-  } // end of loopcounter <1
-
-  else if (loopcounter >= 1)
-  {
-    if (sortedValues[0] > 0)
-    {
-      angle = 0;
-      loopcounter = 0;
-    }
-    else
-    {
-      angle = 400; // no ball detected
-      lastangle = angle;
-      // Serial.println("no ball");
-    }
-    loopcounter = 0;
-  }
-  else
-    ;
-
-  // Serial.println(loopcounter); //HELP ME
-}
-
-uint16_t IRgetAngle()
-{
-  return angle;
-}
-
-float IRgetStrength()
-{
-  // return strength;
-  return strength;
-}
-
-void processIR()
-{
-  // Complete a reading of the sensors after a certain amount of individual readings, sensor values are now stored in the values array until the next complete read
-  for (int i = 0; i < IR_LOOP_NUM; i++)
-  {
-    values[i] = 100 * (double)tempValues[i] / (double)IR_LOOP_NUM; // multiply each value in the array by 100 then divide it by number of times it read the sensors
-    tempValues[i] = 0;                                             // reset values here
-    sortedValues[i] = 0;
-    indexes[i] = 0;
-  }
-  IRCounter = 0;
-  IRsortvalues();
-  IRcalculateanglestrength(BEST_IR_NUM);
-}
+int tempVal[24] = {0}, count = 0, maxVal = -1, maxIndex = -1, totalVal = 0;
+unsigned long lastUp;
+float ballAngle;
 
 void setup()
 {
-  // put your setup code here, to run once:
-  Serial2.begin(115200); // Initialize Serial2 (USART2) for IR
-  pinMode(PB15, OUTPUT); // Initialize LED pin as output
-  initIR();
+  Serial1.begin(115200);
+  pinMode(33, OUTPUT);
+  digitalWrite(33, HIGH);
+
+  pinMode(PC13, INPUT_PULLUP);
+  pinMode(PC14, INPUT_PULLUP);
+  pinMode(PC15, INPUT_PULLUP);
+  pinMode(PA0, INPUT_PULLUP);
+  pinMode(PA1, INPUT_PULLUP);
+  pinMode(PA2, INPUT_PULLUP);
+  pinMode(PA3, INPUT_PULLUP);
+  pinMode(PA4, INPUT_PULLUP);
+  pinMode(PA5, INPUT_PULLUP);
+  pinMode(PA6, INPUT_PULLUP);
+  pinMode(PA7, INPUT_PULLUP);
+  pinMode(PB0, INPUT_PULLUP);
+  pinMode(PB2, INPUT_PULLUP);
+  pinMode(PB14, INPUT_PULLUP);
+  pinMode(PB15, INPUT_PULLUP);
+  pinMode(PA8, INPUT_PULLUP);
+  pinMode(PA11, INPUT_PULLUP);
+  pinMode(PA12, INPUT_PULLUP);
+  pinMode(PA15, INPUT_PULLUP);
+  pinMode(PB3, INPUT_PULLUP);
+  pinMode(PB4, INPUT_PULLUP);
+  pinMode(PB5, INPUT_PULLUP);
+  pinMode(PB6, INPUT_PULLUP);
+  pinMode(PB7, INPUT_PULLUP);
+
+  lastUp = micros();
+}
+
+float mod(float x, float y)
+{
+  x = fmod(x, y);
+  return x < 0 ? x + y : x;
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
-  processIR();
-  Serial2.write(angle);
-  // Serial2.write(12);
-  digitalWrite(PB15, HIGH); // turn the LED on (HIGH is the voltage level)
-  delay(1000);              // wait for a second
-  digitalWrite(PB15, LOW);  // turn the LED off by making the voltage LOW
-  delay(1000);
+  // read IR
+  tempVal[0] += digitalReadFast(PC_13) ^ 1;
+  tempVal[1] += digitalReadFast(PC_14) ^ 1;
+  tempVal[2] += digitalReadFast(PC_15) ^ 1;
+  tempVal[3] += digitalReadFast(PA_0) ^ 1;
+  tempVal[4] += digitalReadFast(PA_1) ^ 1;
+  tempVal[5] += digitalReadFast(PA_2) ^ 1;
+  tempVal[6] += digitalReadFast(PA_3) ^ 1;
+  tempVal[7] += digitalReadFast(PA_4) ^ 1;
+  tempVal[8] += digitalReadFast(PA_5) ^ 1;
+  tempVal[9] += digitalReadFast(PA_6) ^ 1;
+  tempVal[10] += digitalReadFast(PA_7) ^ 1;
+  tempVal[11] += digitalReadFast(PB_0) ^ 1;
+  tempVal[12] += digitalReadFast(PB_2) ^ 1;
+  tempVal[13] += digitalReadFast(PB_14) ^ 1;
+  tempVal[14] += digitalReadFast(PB_15) ^ 1;
+  tempVal[15] += digitalReadFast(PA_8) ^ 1;
+  tempVal[16] += digitalReadFast(PA_11) ^ 1;
+  tempVal[17] += digitalReadFast(PA_12) ^ 1;
+  tempVal[18] += digitalReadFast(PA_15) ^ 1;
+  tempVal[19] += digitalReadFast(PB_3) ^ 1;
+  tempVal[20] += digitalReadFast(PB_4) ^ 1;
+  tempVal[21] += digitalReadFast(PB_5) ^ 1;
+  tempVal[22] += digitalReadFast(PB_6) ^ 1;
+  tempVal[23] += digitalReadFast(PB_7) ^ 1;
+
+  if ((micros() - lastUp) > 3333)
+  {
+    for (int i = 0; i < 24; i++)
+    {
+      // Serial.print(tempVal[i]);
+      // Serial.print(" ");
+      if (tempVal[i] > maxVal)
+      {
+        maxVal = tempVal[i];
+        maxIndex = i;
+      }
+      totalVal += tempVal[i];
+    }
+
+    if (maxIndex == 0)
+    {
+      ballAngle = 330.0 * ((float)tempVal[22] / (float)(tempVal[22] + tempVal[23] + tempVal[0] + tempVal[1] + tempVal[2])) + 345.0 * ((float)tempVal[23] / (float)(tempVal[22] + tempVal[23] + tempVal[0] + tempVal[1] + tempVal[2])) + 360.0 * ((float)tempVal[0] / (float)(tempVal[22] + tempVal[23] + tempVal[0] + tempVal[1] + tempVal[2])) + 375.0 * ((float)tempVal[1] / (float)(tempVal[22] + tempVal[23] + tempVal[0] + tempVal[1] + tempVal[2])) + 390.0 * ((float)tempVal[2] / (float)(tempVal[22] + tempVal[23] + tempVal[0] + tempVal[1] + tempVal[2]));
+    }
+    else if (maxIndex == 23)
+    {
+      ballAngle = 315.0 * ((float)tempVal[21] / (float)(tempVal[21] + tempVal[22] + tempVal[23] + tempVal[0] + tempVal[1])) + 330.0 * ((float)tempVal[22] / (float)(tempVal[21] + tempVal[22] + tempVal[23] + tempVal[0] + tempVal[1])) + 345.0 * ((float)tempVal[23] / (float)(tempVal[21] + tempVal[22] + tempVal[23] + tempVal[0] + tempVal[1])) + 360.0 * ((float)tempVal[0] / (float)(tempVal[21] + tempVal[22] + tempVal[23] + tempVal[0] + tempVal[1])) + 375.0 * ((float)tempVal[1] / (float)(tempVal[21] + tempVal[22] + tempVal[23] + tempVal[0] + tempVal[1]));
+    }
+    else if (maxIndex == 22)
+    {
+      ballAngle = 300.0 * ((float)tempVal[20] / (float)(tempVal[20] + tempVal[21] + tempVal[22] + tempVal[23] + tempVal[0])) + 315.0 * ((float)tempVal[21] / (float)(tempVal[20] + tempVal[21] + tempVal[22] + tempVal[23] + tempVal[0])) + 330.0 * ((float)tempVal[22] / (float)(tempVal[20] + tempVal[21] + tempVal[22] + tempVal[23] + tempVal[0])) + 345.0 * ((float)tempVal[23] / (float)(tempVal[20] + tempVal[21] + tempVal[22] + tempVal[23] + tempVal[0])) + 360.0 * ((float)tempVal[0] / (float)(tempVal[20] + tempVal[21] + tempVal[22] + tempVal[23] + tempVal[0]));
+    }
+    else if (maxIndex == 1)
+    {
+      ballAngle = -15.0 * ((float)tempVal[23] / (float)(tempVal[23] + tempVal[0] + tempVal[1] + tempVal[2] + tempVal[3]))
+                  //+00.0*((float)tempVal[0]/(float)(tempVal[23]+tempVal[0]+tempVal[1]+tempVal[2]+tempVal[3]))
+                  + 15.0 * ((float)tempVal[1] / (float)(tempVal[23] + tempVal[0] + tempVal[1] + tempVal[2] + tempVal[3])) + 30.0 * ((float)tempVal[2] / (float)(tempVal[23] + tempVal[0] + tempVal[1] + tempVal[2] + tempVal[3])) + 45.0 * ((float)tempVal[3] / (float)(tempVal[23] + tempVal[0] + tempVal[1] + tempVal[2] + tempVal[3]));
+    }
+    else if (maxIndex == 2)
+    {
+      ballAngle = // 00.0*((float)tempVal[0]/(float)(tempVal[0]+tempVal[1]+tempVal[2]+tempVal[3]+tempVal[4]))
+          +15.0 * ((float)tempVal[1] / (float)(tempVal[0] + tempVal[1] + tempVal[2] + tempVal[3] + tempVal[4])) + 30.0 * ((float)tempVal[2] / (float)(tempVal[0] + tempVal[1] + tempVal[2] + tempVal[3] + tempVal[4])) + 45.0 * ((float)tempVal[3] / (float)(tempVal[0] + tempVal[1] + tempVal[2] + tempVal[3] + tempVal[4])) + 60.0 * ((float)tempVal[4] / (float)(tempVal[0] + tempVal[1] + tempVal[2] + tempVal[3] + tempVal[4]));
+    }
+    else
+    {
+      ballAngle = (float)(maxIndex - 2) * 15.0 * ((float)tempVal[maxIndex - 2] / (float)(tempVal[maxIndex - 2] + tempVal[maxIndex - 1] + tempVal[maxIndex] + tempVal[maxIndex + 1] + tempVal[maxIndex + 2])) + (float)(maxIndex - 1) * 15.0 * ((float)tempVal[maxIndex - 1] / (float)(tempVal[maxIndex - 2] + tempVal[maxIndex - 1] + tempVal[maxIndex] + tempVal[maxIndex + 1] + tempVal[maxIndex + 2])) + (float)(maxIndex)*15.0 * ((float)tempVal[maxIndex] / (float)(tempVal[maxIndex - 2] + tempVal[maxIndex - 1] + tempVal[maxIndex] + tempVal[maxIndex + 1] + tempVal[maxIndex + 2])) + (float)(maxIndex + 1) * 15.0 * ((float)tempVal[maxIndex + 1] / (float)(tempVal[maxIndex - 2] + tempVal[maxIndex - 1] + tempVal[maxIndex] + tempVal[maxIndex + 1] + tempVal[maxIndex + 2])) + (float)(maxIndex + 2) * 15.0 * ((float)tempVal[maxIndex + 2] / (float)(tempVal[maxIndex - 2] + tempVal[maxIndex - 1] + tempVal[maxIndex] + tempVal[maxIndex + 1] + tempVal[maxIndex + 2]));
+    }
+    ballAngle = mod(ballAngle, 360);
+
+    /*if(Serial1.available()) {
+      char info = Serial1.read();
+      Serial1.print(ballAngle);
+      Serial1.print(",");
+      Serial1.print(totalVal);
+      Serial1.print("|");
+    }*/
+    Serial1.print('I');
+    Serial1.print(ballAngle);
+    Serial1.print(',');
+    Serial1.print(totalVal);
+    Serial1.print('|');
+
+    memset(tempVal, 0, sizeof(tempVal));
+    maxVal = -1;
+    maxIndex = -1;
+    totalVal = 0;
+    // Serial.print(ballAngle); Serial.print(" ");
+    // Serial.print(maxVal); Serial.print(" ");
+    // Serial.print(totalVal);
+    // Serial.println();
+
+    lastUp = micros();
+  }
 }
