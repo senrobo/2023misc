@@ -119,7 +119,7 @@ void IRsortvalues()
 
         sortedValues[j] = values[i];
         indexes[j] = i;
-        break;
+        
       }
     }
   }
