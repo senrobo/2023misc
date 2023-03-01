@@ -1,37 +1,37 @@
-int tempVal[24] = {0}, count = 0, maxVal = -1, maxIndex = -1, totalVal = 0;
+#include <Arduino.h>
+int tempVal[24] = {0},
+    count = 0, maxVal = -1, maxIndex = -1, totalVal = 0;
 unsigned long lastUp;
 float ballAngle;
 
 void setup()
 {
-  Serial1.begin(115200);
-  pinMode(33, OUTPUT);
-  digitalWrite(33, HIGH);
-
-  pinMode(PC13, INPUT_PULLUP);
-  pinMode(PC14, INPUT_PULLUP);
-  pinMode(PC15, INPUT_PULLUP);
-  pinMode(PA0, INPUT_PULLUP);
-  pinMode(PA1, INPUT_PULLUP);
-  pinMode(PA2, INPUT_PULLUP);
-  pinMode(PA3, INPUT_PULLUP);
-  pinMode(PA4, INPUT_PULLUP);
-  pinMode(PA5, INPUT_PULLUP);
-  pinMode(PA6, INPUT_PULLUP);
-  pinMode(PA7, INPUT_PULLUP);
-  pinMode(PB0, INPUT_PULLUP);
-  pinMode(PB2, INPUT_PULLUP);
-  pinMode(PB14, INPUT_PULLUP);
-  pinMode(PB15, INPUT_PULLUP);
-  pinMode(PA8, INPUT_PULLUP);
-  pinMode(PA11, INPUT_PULLUP);
-  pinMode(PA12, INPUT_PULLUP);
-  pinMode(PA15, INPUT_PULLUP);
-  pinMode(PB3, INPUT_PULLUP);
-  pinMode(PB4, INPUT_PULLUP);
-  pinMode(PB5, INPUT_PULLUP);
-  pinMode(PB6, INPUT_PULLUP);
-  pinMode(PB7, INPUT_PULLUP);
+  Serial1.begin(115200); // Debug
+  Serial2.begin(115200); // Teensy
+  pinMode(PA5, INPUT);
+  pinMode(PA4, INPUT);
+  pinMode(PA1, INPUT);
+  pinMode(PA0, INPUT);
+  pinMode(PC15, INPUT);
+  pinMode(PC14, INPUT);
+  pinMode(PB9, INPUT);
+  pinMode(PB8, INPUT);
+  pinMode(PB7, INPUT);
+  pinMode(PB6, INPUT);
+  pinMode(PB5, INPUT);
+  pinMode(PB4, INPUT);
+  pinMode(PB3, INPUT);
+  pinMode(PA15, INPUT);
+  pinMode(PB14, INPUT);
+  pinMode(PB13, INPUT);
+  pinMode(PB12, INPUT);
+  pinMode(PB11, INPUT);
+  pinMode(PB10, INPUT);
+  pinMode(PB2, INPUT);
+  pinMode(PB1, INPUT);
+  pinMode(PB0, INPUT);
+  pinMode(PA7, INPUT);
+  pinMode(PA6, INPUT);
 
   lastUp = micros();
 }
@@ -45,30 +45,30 @@ float mod(float x, float y)
 void loop()
 {
   // read IR
-  tempVal[0] += digitalReadFast(PC_13) ^ 1;
-  tempVal[1] += digitalReadFast(PC_14) ^ 1;
-  tempVal[2] += digitalReadFast(PC_15) ^ 1;
-  tempVal[3] += digitalReadFast(PA_0) ^ 1;
-  tempVal[4] += digitalReadFast(PA_1) ^ 1;
-  tempVal[5] += digitalReadFast(PA_2) ^ 1;
-  tempVal[6] += digitalReadFast(PA_3) ^ 1;
-  tempVal[7] += digitalReadFast(PA_4) ^ 1;
-  tempVal[8] += digitalReadFast(PA_5) ^ 1;
-  tempVal[9] += digitalReadFast(PA_6) ^ 1;
-  tempVal[10] += digitalReadFast(PA_7) ^ 1;
-  tempVal[11] += digitalReadFast(PB_0) ^ 1;
-  tempVal[12] += digitalReadFast(PB_2) ^ 1;
-  tempVal[13] += digitalReadFast(PB_14) ^ 1;
-  tempVal[14] += digitalReadFast(PB_15) ^ 1;
-  tempVal[15] += digitalReadFast(PA_8) ^ 1;
-  tempVal[16] += digitalReadFast(PA_11) ^ 1;
-  tempVal[17] += digitalReadFast(PA_12) ^ 1;
-  tempVal[18] += digitalReadFast(PA_15) ^ 1;
-  tempVal[19] += digitalReadFast(PB_3) ^ 1;
-  tempVal[20] += digitalReadFast(PB_4) ^ 1;
-  tempVal[21] += digitalReadFast(PB_5) ^ 1;
-  tempVal[22] += digitalReadFast(PB_6) ^ 1;
-  tempVal[23] += digitalReadFast(PB_7) ^ 1;
+  tempVal[0] = digitalRead(PA5) ^ 1;
+  tempVal[1] = digitalRead(PA4) ^ 1;
+  tempVal[2] = digitalRead(PA1) ^ 1;
+  tempVal[3] = digitalRead(PA0) ^ 1;
+  tempVal[4] = digitalRead(PC15) ^ 1;
+  tempVal[5] = digitalRead(PC14) ^ 1;
+  tempVal[6] = digitalRead(PB9) ^ 1;
+  tempVal[7] = digitalRead(PB8) ^ 1;
+  tempVal[8] = digitalRead(PB7) ^ 1;
+  tempVal[9] = digitalRead(PB6) ^ 1;
+  tempVal[10] = digitalRead(PB5) ^ 1;
+  tempVal[11] = digitalRead(PB4) ^ 1;
+  tempVal[12] = digitalRead(PB3) ^ 1;
+  tempVal[13] = digitalRead(PA15) ^ 1;
+  tempVal[14] = digitalRead(PB14) ^ 1;
+  tempVal[15] = digitalRead(PB13) ^ 1;
+  tempVal[16] = digitalRead(PB12) ^ 1;
+  tempVal[17] = digitalRead(PB11) ^ 1;
+  tempVal[18] = digitalRead(PB10) ^ 1;
+  tempVal[19] = digitalRead(PB2) ^ 1;
+  tempVal[20] = digitalRead(PB1) ^ 1;
+  tempVal[21] = digitalRead(PB0) ^ 1;
+  tempVal[22] = digitalRead(PA7) ^ 1;
+  tempVal[23] = digitalRead(PA6) ^ 1;
 
   if ((micros() - lastUp) > 3333)
   {
@@ -125,6 +125,8 @@ void loop()
     Serial1.print(',');
     Serial1.print(totalVal);
     Serial1.print('|');
+
+    Serial2.write(ballAngle);
 
     memset(tempVal, 0, sizeof(tempVal));
     maxVal = -1;
