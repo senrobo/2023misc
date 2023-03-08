@@ -12,25 +12,22 @@ void setup()
   Serial5.begin(115200); // Ultra Serial Serial
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH); // turn the LED on (HIGH is the voltage level)
-  pinMode(3, OUTPUT); //FL PWM
-  pinMode(4, OUTPUT); //FL DIR
-  pinMode(5, OUTPUT); //FR PWM
-  pinMode(6, OUTPUT); //FR DIR
-  pinMode(9,OUTPUT); //BR PWM
-  pinMode(10,OUTPUT); //BR DIR
-  pinMode(11,OUTPUT); //BL PWM
-  pinMode(12,OUTPUT); //BL DIR
+  pinMode(3, OUTPUT);     // FL PWM
+  pinMode(4, OUTPUT);     // FL DIR
+  pinMode(5, OUTPUT);     // FR PWM
+  pinMode(6, OUTPUT);     // FR DIR
+  pinMode(9, OUTPUT);     // BR PWM
+  pinMode(10, OUTPUT);    // BR DIR
+  pinMode(11, OUTPUT);    // BL PWM
+  pinMode(12, OUTPUT);    // BL DIR
 }
 
 void loop()
 {
   // put your main code here, to run repeatedly:
-  digitalWrite(4,LOW);
-  analogWrite(3,100);
-  digitalWrite(6,1);
-  analogWrite(5,100);
-  digitalWrite(10,1);
-  analogWrite(9,100);
-  digitalWrite(12,1);
-  analogWrite(11,100);
+  while (Serial4.available() < 1)
+  {
+  };
+  incomingByte = Serial4.read();
+  Serial.println(incomingByte);
 }
