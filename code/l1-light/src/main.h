@@ -20,6 +20,7 @@
 // microseconds between each channel switch
 #define MUX_DELAY 70
 
+// Initilalize Variables
 float lineAngle = 0;
 float lineTrackAngle;
 float lastLineAngle = 0;
@@ -31,8 +32,11 @@ int outSensors = 0;
 float clusterStart;
 float clusterEnd;
 
-// mapping from light sensor position in MUX to position in circle clockwise
-int lightMap[30] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29};
+int lightVals[30];
+int maxVals[30];
+int minVals[30];
+long readTimer = 0;
+int lightCnt = 0;
 
 int fixedThreshFirstBot[30] = {224, 333, 372, 224, 388, 224, 398, 406, 224, 400, 391, 402, 336, 164, 224, 224, 224, 224, 224, 398, 391, 402, 336, 164, 224, 271, 224, 333, 224, 224};
 
@@ -54,14 +58,5 @@ int muxChannel[16][4] = {
     {0, 1, 1, 1}, // channel 14
     {1, 1, 1, 1}  // channel 15
 };
-
-LightBuffer lightThresh;
-LightBuffer lightBuffer;
-LineData lineData;
-int lightVals[30];
-int maxVals[30];
-int minVals[30];
-long readTimer = 0;
-int lightCnt = 0;
 
 #endif
