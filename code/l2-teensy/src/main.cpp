@@ -22,12 +22,17 @@ void setup()
   pinMode(12, OUTPUT);    // BL DIR
 }
 
+void readLightData(){}
+void processLightData(){}
+void readCompassData(){}
+void readUltraData(){}
+void readCameraData(){}
+void readIRData(){}
+
+
+
 void loop()
 {
   // put your main code here, to run repeatedly:
-  while (Serial4.available() < 1)
-  {
-  };
-  incomingByte = Serial4.read();
-  Serial.println(incomingByte);
+  
 }

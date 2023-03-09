@@ -1,10 +1,21 @@
+// TODO: EEPROM, PROCESS SENSOR DATA ,AUTO CALIBRATE SENSORS, GET DATA FROM TEENSY, PRINT VALUES, PRINT THRESHOLDS
+
 #include "main.h"
 
-#ifdef USE_EEPROM
+float mod(float x, float y);
 
-#else
+float angleBetween(float x, float y) { return mod((y - x), 360); }
 
-#endif
+float midAngleBetween(float x, float y)
+{
+  return mod(x + angleBetween(x, y) / 2.0, 360);
+}
+
+float angleDiff(float x, float y)
+{
+  float diff = angleBetween(x, y);
+  return fmin(diff, 360 - diff);
+}
 
 void setup()
 {
@@ -88,6 +99,36 @@ void autoCalibrateLightSensors()
 {
 }
 
+void processLightData()
+{
+  // Ideally it should be 2 values thats on the line since the world is not perfect we shall compare the values of the sensors with the 2 greatest values so use a for loop and then compare the values
+
+  if (outSensors != 0)
+  {
+    for (int i = 0; i < outSensors; i++)
+    {
+      for (int j = 1; j < outSensors; j++)
+      {
+        int tmpDiff = angleDiff(lineDetected[i] * ldrAngle, lineDetected[j] * ldrAngle);
+        if (tmpDiff > largestDiff)
+        {
+          clusterStart = lineDetected[i] * ldrAngle;
+          clusterEnd = lineDetected[j] * ldrAngle;
+          largestDiff = tmpDiff;
+        }
+      }
+    }
+
+    float chordLength = angleDiff(clusterStart, clusterEnd) / 180;
+    float lineAngle = angleBetween(clusterStart, clusterEnd) <= 180 ? midAngleBetween(clusterStart, clusterEnd) : midAngleBetween(clusterEnd, clusterStart);
+  }
+  else
+  {
+    bool onLine = false;
+  }
+  outSensors = 0;
+}
+
 // Teensy Stuff
 void readDataFromTeensy()
 {
@@ -95,14 +136,9 @@ void readDataFromTeensy()
 
 void sendDataToTeensy()
 {
-  // Send data to Teensy
-  Serial2.write((byte)outSensors);
-  for (int i = 0; i < outSensors; i++)
-  {
-    Serial2.write((byte)lineDetected[i]);
-  }
-  outSensors = 0;
-  lightCnt = 0;
+  // Send if its onLine
+  // Send chordLength
+  // Send lineAngle
 }
 
 // Print Stuff

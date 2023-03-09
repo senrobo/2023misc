@@ -27,16 +27,17 @@ float lastLineAngle = 0;
 float initialLineAngle = 0;
 float chordLength = 0;
 bool onLine = false;
-int lineDetected[32];
+int lineDetected[30];
 int outSensors = 0;
-float clusterStart;
-float clusterEnd;
-
 int lightVals[30];
 int maxVals[30];
 int minVals[30];
 long readTimer = 0;
 int lightCnt = 0;
+int ldrAngle = 12;
+int largestDiff = 0;
+int clusterStart = 0;
+int clusterEnd = 0;
 
 int fixedThreshFirstBot[30] = {224, 333, 372, 224, 388, 224, 398, 406, 224, 400, 391, 402, 336, 164, 224, 224, 224, 224, 224, 398, 391, 402, 336, 164, 224, 271, 224, 333, 224, 224};
 
