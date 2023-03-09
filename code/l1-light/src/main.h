@@ -2,7 +2,7 @@
 #define LIGHT_H
 
 #include "Arduino.h"
-
+#include "EEPROM.h"
 // STM32 Pinouts
 #define mux1 PB0
 #define mux2 PB7

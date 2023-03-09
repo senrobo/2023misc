@@ -1,5 +1,11 @@
 #include "main.h"
 
+#ifdef USE_EEPROM
+
+#else
+
+#endif
+
 void setup()
 {
   // put your setup code here, to run once:
@@ -76,6 +82,15 @@ void updateSensors()
     readTimer = micros();
   }
 }
+
+void autoCalibrateLightSensors()
+{
+}
+
+void readDataFromTeensy()
+{
+}
+
 void sendDataToTeensy()
 {
   // Send data to Teensy
@@ -86,6 +101,10 @@ void sendDataToTeensy()
   }
   outSensors = 0;
 }
+
+void printValues() {}
+
+void printThresholds() {}
 
 void loop()
 {
