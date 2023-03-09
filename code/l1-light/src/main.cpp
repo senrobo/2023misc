@@ -45,6 +45,7 @@ void setup()
   digitalWrite(sol, LOW);
 }
 
+// Light Stuff
 void updateSensors()
 {
   if (micros() - readTimer >= MUX_DELAY)
@@ -87,6 +88,7 @@ void autoCalibrateLightSensors()
 {
 }
 
+// Teensy Stuff
 void readDataFromTeensy()
 {
 }
@@ -100,8 +102,10 @@ void sendDataToTeensy()
     Serial2.write((byte)lineDetected[i]);
   }
   outSensors = 0;
+  lightCnt = 0;
 }
 
+// Print Stuff
 void printValues() {}
 
 void printThresholds() {}
