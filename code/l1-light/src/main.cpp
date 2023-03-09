@@ -76,11 +76,20 @@ void updateSensors()
     readTimer = micros();
   }
 }
-void sendDataToTeensy() {}
+void sendDataToTeensy()
+{
+  // Send data to Teensy
+  Serial2.write((byte)outSensors);
+  for (int i = 0; i < outSensors; i++)
+  {
+    Serial2.write((byte)lineDetected[i]);
+  }
+  outSensors = 0;
+}
 
 void loop()
 {
   // put your main code here, to run repeatedly:
   updateSensors();
-  // sendDataToTeensy();
+  sendDataToTeensy();
 }
