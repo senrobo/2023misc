@@ -22,12 +22,26 @@ void setup()
   pinMode(12, OUTPUT);    // BL DIR
 }
 
+void readLightData(){}
+void processLightData(){}
+void readCompassData(){}
+void readUltraData(){}
+void readCameraData(){}
+void readIRData(){}
+
+
+
 void loop()
 {
   // put your main code here, to run repeatedly:
+<<<<<<< HEAD
   for (int i = 0; i < 255; i++)
   {
     analogWrite(3, i);
     delay(10);
   }
 }
+=======
+  
+}
+>>>>>>> b6bfe88f2551d08e799a8cc1b6555f27b702cfcc
